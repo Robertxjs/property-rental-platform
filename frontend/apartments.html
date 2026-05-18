@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Management Apartamente - RentApp</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block; height: auto; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; width: auto; display: inline-block; margin-right: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Gestionare Apartamente</h2>
+            <button onclick="window.location.href='dashboard.html'" style="width: auto; padding: 8px 15px; background-color: #6c757d;">Înapoi</button>
+        </div>
+        <hr>
+
+        <h3 id="formTitle">Adaugă un Apartament Nou</h3>
+        <form id="apartmentForm">
+            <input type="hidden" id="apartmentId">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Adresă:</label>
+                    <input type="text" id="aptAddress" required>
+                </div>
+                <div class="form-group">
+                    <label>Clădire/Bloc:</label>
+                    <input type="text" id="aptBuilding" required>
+                </div>
+                <div class="form-group">
+                    <label>Etaj:</label>
+                    <input type="text" id="aptFloor" required>
+                </div>
+                <div class="form-group">
+                    <label>Număr Camere:</label>
+                    <input type="number" id="aptRooms" required>
+                </div>
+                <div class="form-group">
+                    <label>Suprafață (mp):</label>
+                    <input type="number" step="0.1" id="aptSize" required>
+                </div>
+                <div class="form-group">
+                    <label>Chirie Lunară (€):</label>
+                    <input type="number" step="0.01" id="aptRent" required>
+                </div>
+                <div class="form-group">
+                    <label>Depozit / Garanție (€):</label>
+                    <input type="number" step="0.01" id="aptDeposit" required>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <select id="aptStatus">
+                        <option value="AVAILABLE">Disponibil (Available)</option>
+                        <option value="OCCUPIED">Ocupat (Occupied)</option>
+                        <option value="MAINTENANCE">Mentenanță (Maintenance)</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" id="saveAptBtn">Salvează Apartamentul</button>
+            <button type="button" id="cancelEditBtn" style="background-color: #6c757d; display: none; margin-top: 10px;">Anulează Editarea</button>
+        </form>
+
+        <hr style="margin: 30px 0;">
+
+        <h3>Lista Apartamentelor Tale</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Adresă</th>
+                    <th>Detalii (Bloc/Etaj)</th>
+                    <th>Camere/Suprafață</th>
+                    <th>Chirie</th>
+                    <th>Status</th>
+                    <th>Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody id="apartmentsTableBody">
+                </tbody>
+        </table>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Încărcăm datele imediat ce pagina s-a încărcat
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user || user.role !== "LANDLORD") {
+                alert("Acces interzis! Doar proprietarii pot accesa această pagină.");
+                window.location.href = "dashboard.html";
+                return;
+            }
+            loadApartments();
+        });
+    </script>
+</body>
+</html>

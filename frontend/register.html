@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Înregistrare - RentApp</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <h2>Creează un cont nou</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label>Nume Complet:</label>
+                <input type="text" id="regFullName" required>
+            </div>
+            <div class="form-group">
+                <label>Email (va fi unic):</label>
+                <input type="email" id="regEmail" required>
+            </div>
+            <div class="form-group">
+                <label>Parolă:</label>
+                <input type="password" id="regPassword" required>
+            </div>
+            <div class="form-group">
+                <label>Telefon:</label>
+                <input type="text" id="regPhone">
+            </div>
+            <div class="form-group">
+                <label>Tip Utilizator (Rol):</label>
+                <select id="regRole">
+                    <option value="TENANT">Chiriaș (Tenant)</option>
+                    <option value="LANDLORD">Proprietar (Landlord)</option>
+                </select>
+            </div>
+            <button type="submit">Înregistrare</button>
+        </form>
+        <p>Ai deja cont? <a href="login.html">Conectează-te aici</a></p>
+        <div id="registerMessage" class="message"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>RentApp - Welcome</title>
+    <script>
+        // Verificăm dacă există un utilizator salvat în memoria browserului (localStorage)
+        const user = localStorage.getItem("user");
+        if (!user) {
+            window.location.href = "login.html"; // Redirecționare la login 
+        } else {
+            window.location.href = "dashboard.html"; // Redirecționare la dashboard 
+        }
+    </script>
+</head>
+<body>
+    <p>Se încarcă...</p>
+</body>
+</html>

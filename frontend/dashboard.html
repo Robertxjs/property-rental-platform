@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - RentApp</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container" style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 500px;">
+        <h2>Bun venit la panoul principal!</h2>
+        <hr>
+        <div style="margin: 20px 0; font-size: 16px;">
+            <p><strong>Nume:</strong> <span id="dashName">-</span></p>
+            <p><strong>Email:</strong> <span id="dashEmail">-</span></p>
+            <p><strong>Rol:</strong> <span id="dashRole">-</span></p>
+        </div>
+        
+        <div id="landlordSection" style="display: none; margin-bottom: 20px;">
+            <button onclick="window.location.href='apartments.html'" style="background-color: #28a745;">Gestionează Apartamentele</button>
+        </div>
+
+        <button onclick="logout()" style="background-color: #dc3545;">Deconectare</button>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Verificare sesiune la încărcarea paginii
+        document.addEventListener("DOMContentLoaded", () => {
+            const userJson = localStorage.getItem("user");
+            if (!userJson) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const user = JSON.parse(userJson);
+            document.getElementById("dashName").innerText = user.fullName;
+            document.getElementById("dashEmail").innerText = user.email;
+            document.getElementById("dashRole").innerText = user.role;
+
+            // Afișează secțiunea de management doar dacă utilizatorul este LANDLORD
+            if (user.role === "LANDLORD") {
+                document.getElementById("landlordSection").style.display = "block";
+            }
+        });
+    </script>
+</body>
+</html>
