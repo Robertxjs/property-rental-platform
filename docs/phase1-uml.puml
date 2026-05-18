@@ -1,0 +1,170 @@
+@startuml
+title Phase 1 UML - Spring Boot Rental App
+
+package "Frontend" {
+  class index.html
+  class login.html
+  class register.html
+  class dashboard.html
+  class apartments.html
+  class app.js
+  class style.css
+}
+
+package "Backend - Spring Boot" {
+
+  package "Controller" {
+    class AuthController {
+      +register(RegisterRequest)
+      +login(LoginRequest)
+    }
+
+    class ApartmentController {
+      +getApartments()
+      +getApartmentById(Long id)
+      +createApartment(ApartmentRequest)
+      +updateApartment(Long id, ApartmentRequest)
+      +deleteApartment(Long id)
+    }
+  }
+
+  package "Service" {
+    class AuthService {
+      +register(RegisterRequest)
+      +login(LoginRequest)
+    }
+
+    class ApartmentService {
+      +findAllByLandlord(Long landlordId)
+      +findById(Long id)
+      +create(ApartmentRequest, Long landlordId)
+      +update(Long id, ApartmentRequest)
+      +delete(Long id)
+    }
+  }
+
+  package "Repository" {
+    interface UserRepository {
+      +findByEmail(String email)
+      +save(User user)
+    }
+
+    interface ApartmentRepository {
+      +findByLandlordId(Long landlordId)
+      +findById(Long id)
+      +save(Apartment apartment)
+      +delete(Apartment apartment)
+    }
+  }
+
+  package "Model" {
+    class User {
+      -Long id
+      -String fullName
+      -String email
+      -String passwordHash
+      -String phone
+      -Role role
+    }
+
+    class Apartment {
+      -Long id
+      -String address
+      -String building
+      -Integer floor
+      -Integer rooms
+      -Double size
+      -BigDecimal monthlyRent
+      -BigDecimal deposit
+      -ApartmentStatus status
+    }
+
+    enum Role {
+      LANDLORD
+      TENANT
+    }
+
+    enum ApartmentStatus {
+      AVAILABLE
+      OCCUPIED
+      MAINTENANCE
+    }
+  }
+
+  package "DTO" {
+    class RegisterRequest {
+      +String fullName
+      +String email
+      +String password
+      +String phone
+      +Role role
+    }
+
+    class LoginRequest {
+      +String email
+      +String password
+    }
+
+    class ApartmentRequest {
+      +String address
+      +String building
+      +Integer floor
+      +Integer rooms
+      +Double size
+      +BigDecimal monthlyRent
+      +BigDecimal deposit
+      +ApartmentStatus status
+    }
+  }
+}
+
+package "Database - MySQL" {
+  class users {
+    id
+    full_name
+    email
+    password_hash
+    phone
+    role
+  }
+
+  class apartments {
+    id
+    landlord_id
+    address
+    building
+    floor
+    rooms
+    size
+    monthly_rent
+    deposit
+    status
+  }
+}
+
+app.js --> AuthController : fetch()
+app.js --> ApartmentController : fetch()
+
+AuthController --> AuthService
+ApartmentController --> ApartmentService
+
+AuthService --> UserRepository
+ApartmentService --> ApartmentRepository
+ApartmentService --> UserRepository
+
+UserRepository --> users
+ApartmentRepository --> apartments
+
+User "1" --> "0..*" Apartment : landlord owns
+User --> Role
+Apartment --> ApartmentStatus
+
+RegisterRequest --> AuthController
+LoginRequest --> AuthController
+ApartmentRequest --> ApartmentController
+
+apartments --> users : landlord_id
+
+@enduml
+
+
