@@ -1,0 +1,37 @@
+[ {
+  "id" : 1779306389226,
+  "apartment" : {
+    "id" : 1,
+    "landlord" : {
+      "id" : 2,
+      "fullName" : "a",
+      "email" : "a@a",
+      "passwordHash" : "HASHED_a",
+      "phone" : "a",
+      "role" : "LANDLORD",
+      "createdAt" : [ 2026, 5, 20, 15, 31, 16 ]
+    },
+    "address" : "a",
+    "building" : "a",
+    "floor" : "a",
+    "rooms" : 1,
+    "size" : 1.0,
+    "monthlyRent" : 1.0,
+    "deposit" : 1.0,
+    "status" : "OCCUPIED",
+    "createdAt" : [ 2026, 5, 20, 15, 33, 47 ]
+  },
+  "tenant" : {
+    "id" : 3,
+    "fullName" : "b",
+    "email" : "b@b",
+    "passwordHash" : "HASHED_b",
+    "phone" : "b",
+    "role" : "TENANT",
+    "createdAt" : [ 2026, 5, 20, 15, 34, 12 ]
+  },
+  "title" : "casa",
+  "description" : "a bubuit",
+  "status" : "RESOLVED",
+  "createdAt" : [ 2026, 5, 20, 22, 46, 29, 226343400 ]
+} ]

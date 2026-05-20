@@ -89,7 +89,6 @@
                     method: "PUT"
                 });
                 if(response.ok) {
-                    alert("Tichet actualizat!");
                     const user = JSON.parse(localStorage.getItem("user"));
                     loadTickets(user.id);
                 }

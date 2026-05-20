@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tickets")
-@CrossOrigin(origins = "")
+@CrossOrigin(origins = "*")
 public class TicketController {
 
     private final TicketService ticketService;
