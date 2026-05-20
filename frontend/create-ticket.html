@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Trimite Tichet Suport - RentApp</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f6f9; margin: 0; }
+        .form-container { background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 450px; }
+        h2 { margin-top: 0; color: #333; text-align: center; }
+        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; resize: none; margin-bottom: 15px; }
+        .btn-group { display: flex; gap: 10px; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Raportează o Problemă Proprietarului</h2>
+        <hr style="margin-bottom: 20px; border: 0; border-top: 1px solid #eee;">
+        
+        <form id="ticketForm">
+            <div class="form-group">
+                <label>Titlu Problemă (ex: Defecțiune Centrală):</label>
+                <input type="text" id="ticketTitle" required placeholder="Ce s-a defectat?">
+            </div>
+            <div class="form-group">
+                <label>Descriere Detaliată:</label>
+                <textarea id="ticketDescription" placeholder="Descrie problema în detaliu pentru a ajuta proprietarul..." required></textarea>
+            </div>
+            <div class="btn-group">
+                <button type="submit">Trimite Tichetul</button>
+                <button type="button" style="background-color: #6c757d;" onclick="window.location.href='my-rented-apartments.html'">Anulează</button>
+            </div>
+        </form>
+        <div id="statusMessage" class="message"></div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const apartmentId = urlParams.get('apartmentId');
+
+        document.getElementById("ticketForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const user = JSON.parse(localStorage.getItem("user"));
+            const msgDiv = document.getElementById("statusMessage");
+
+            const payload = {
+                apartmentId: parseInt(apartmentId),
+                tenantId: user.id,
+                title: document.getElementById("ticketTitle").value,
+                description: document.getElementById("ticketDescription").value
+            };
+
+            try {
+                const response = await fetch("http://localhost:8081/api/tickets", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    msgDiv.style.color = "green";
+                    msgDiv.innerText = "Tichetul a fost transmis cu succes proprietarului!";
+                    setTimeout(() => window.location.href = "my-rented-apartments.html", 2000);
+                } else {
+                    msgDiv.style.color = "red";
+                    msgDiv.innerText = "Eroare la trimiterea tichetului.";
+                }
+            } catch (error) {
+                msgDiv.style.color = "red";
+                msgDiv.innerText = "Eroare de conectare la rețea.";
+            }
+        });
+    </script>
+</body>
+</html>

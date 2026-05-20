@@ -83,6 +83,9 @@
                             <div class="info-row"><strong>Chirie Lunară:</strong> <span style="color:#28a745; font-weight:bold;">${apt.monthlyRent} €</span></div>
                             <div class="info-row"><strong>Garanție platită:</strong> ${apt.deposit} €</div>
                             <hr style="border:0; border-top: 1px solid #eee; margin: 15px 0;">
+                            <div style="margin-bottom: 10px;">
+                                <button onclick="deschidePaginaTichet(${apt.id})" style="background-color: #ffc107; color: black; font-size: 12px; padding: 5px 10px; width: auto;">Raportează o Problemă (Ticket)</button>
+                            </div>
                             <div class="info-row" style="display:flex; justify-content:space-between; align-items:center;">
                                 <span class="badge-success">✓ Drept de Locuire</span>
                                 <span style="font-size:11px; color:#999;">ID Apartament: ${apt.id}</span>
@@ -95,6 +98,9 @@
                 console.error("Eroare la filtrarea apartamentelor:", error);
                 gridContainer.innerHTML = `<p style="text-align: center; color: red; grid-column: 1/-1;">Eroare la conectarea cu serverul.</p>`;
             }
+        }
+        function deschidePaginaTichet(apartmentId) {
+            window.location.href = "create-ticket.html?apartmentId=" + apartmentId;
         }
     </script>
 </body>

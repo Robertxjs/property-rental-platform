@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Tichete Primite - RentApp</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block; height: auto; padding: 0; margin: 0; background-color: #f4f6f9; }
+        .navbar { background-color: #ffffff; padding: 15px 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 1100px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .badge { padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; color: white; }
+        .badge-open { background-color: #dc3545; }
+        .badge-resolved { background-color: #28a745; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div style="font-size: 20px; font-weight: bold; color: #28a745;">RentApp - Probleme Tehnice</div>
+        <button onclick="window.location.href='dashboard.html'" style="width: auto; padding: 8px 15px; background-color: #6c757d;">Dashboard</button>
+    </nav>
+
+    <div class="container">
+        <h2>Sesizări și Defecțiuni de la Chiriași</h2>
+        <hr>
+        <table>
+            <thead>
+                <tr>
+                    <th>Apartament (Adresă)</th>
+                    <th>Chiriaș</th>
+                    <th>Subiect</th>
+                    <th>Descriere Problemă</th>
+                    <th>Status</th>
+                    <th>Acțiune</th>
+                </tr>
+            </thead>
+            <tbody id="ticketsTableBody">
+                <tr><td colspan="6" style="text-align:center;">Se încarcă tichetele...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const user = JSON.parse(localStorage.getItem("user"));
+            loadTickets(user.id);
+        });
+
+        async function loadTickets(landlordId) {
+            const tableBody = document.getElementById("ticketsTableBody");
+            try {
+                const response = await fetch("http://localhost:8081/api/tickets/landlord/" + landlordId);
+                const tickets = await response.json();
+                tableBody.innerHTML = "";
+
+                if(tickets.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Nicio problemă raportată momentan.</td></tr>`;
+                    return;
+                }
+
+                tickets.forEach(t => {
+                    let badgeColor = t.status === "OPEN" ? "badge-open" : "badge-resolved";
+                    let actionButton = t.status === "OPEN" 
+                        ? `<button onclick="marcheazaRezolvat(${t.id})" style="font-size:12px; padding:5px; width:auto; background-color:#28a745;">Rezolvat</button>`
+                        : `<span style="color:gray; font-size:12px;">Soluționat</span>`;
+
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${t.apartment ? t.apartment.address : 'N/A'}</td>
+                            <td>${t.tenant ? t.tenant.fullName : 'N/A'}</td>
+                            <td><strong>${t.title}</strong></td>
+                            <td>"${t.description}"</td>
+                            <td><span class="badge ${badgeColor}">${t.status}</span></td>
+                            <td>${actionButton}</td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Eroare server.</td></tr>`;
+            }
+        }
+
+        async function marcheazaRezolvat(ticketId) {
+            if(!confirm("Confirmați că această problemă a fost rezolvată?")) return;
+            try {
+                const response = await fetch(`http://localhost:8081/api/tickets/${ticketId}/status?status=RESOLVED`, {
+                    method: "PUT"
+                });
+                if(response.ok) {
+                    alert("Tichet actualizat!");
+                    const user = JSON.parse(localStorage.getItem("user"));
+                    loadTickets(user.id);
+                }
+            } catch (error) {
+                alert("Eroare la actualizare.");
+            }
+        }
+    </script>
+</body>
+</html>
