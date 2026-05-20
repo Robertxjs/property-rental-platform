@@ -5,11 +5,17 @@
     <title>RentApp - Welcome</title>
     <script>
         // Verificăm dacă există un utilizator salvat în memoria browserului (localStorage)
-        const user = localStorage.getItem("user");
-        if (!user) {
+        const userJson = localStorage.getItem("user");
+        if (!userJson) {
             window.location.href = "login.html"; // Redirecționare la login 
         } else {
-            window.location.href = "dashboard.html"; // Redirecționare la dashboard 
+            const user = JSON.parse(userJson);
+
+            if(user.role == "TENANT"){
+                window.location.href = "browse.html";
+            }else{
+                window.location.href = "dashboard.html";
+            }
         }
     </script>
 </head>

@@ -1,6 +1,6 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f6f9;
+    background-color: rgba(30, 29, 29, 0.71);
     margin: 0;
     display: flex;
     justify-content: center;
@@ -12,7 +12,7 @@ body {
     background-color: #ffffff;
     padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 4px 12px rgba(139, 150, 38, 0.491);
     width: 350px;
 }
 

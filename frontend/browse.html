@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Apartamente Disponibile - RentApp</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block; height: auto; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; width: auto; display: inline-block; }
+        .user-info { font-size: 14px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2>Platforma de Închirieri - Apartamente Disponibile</h2>
+                <div class="user-info">Conectat ca: <strong id="tenantEmail">-</strong> (Chiriaș)</div>
+            </div>
+            <button onclick="logout()" style="width: auto; padding: 8px 15px; background-color: #dc3545;">Deconectare</button>
+        </div>
+        <hr style="margin: 20px 0;">
+
+        <h3>Listă Proprietăți Disponibile</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Adresă</th>
+                    <th>Detalii (Bloc/Etaj)</th>
+                    <th>Camere / Suprafață</th>
+                    <th>Chirie Lunară</th>
+                    <th>Depozit / Garanție</th>
+                    <th>Acțiune</th>
+                </tr>
+            </thead>
+            <tbody id="browseTableBody">
+                </tbody>
+        </table>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userJson = localStorage.getItem("user");
+            if (!userJson) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const user = JSON.parse(userJson);
+            if (user.role !== "TENANT") {
+                alert("Acces interzis! Această pagină este destinată chiriașilor.");
+                window.location.href = "dashboard.html";
+                return;
+            }
+
+            document.getElementById("tenantEmail").innerText = user.email;
+            loadAvailableApartments();
+        });
+
+        async function loadAvailableApartments() {
+            const tableBody = document.getElementById("browseTableBody");
+            if (!tableBody) return;
+
+            try {
+                const response = await fetch("http://localhost:8081/api/apartments");
+                const apartments = await response.json();
+                
+                tableBody.innerHTML = "";
+
+                // Regula de business pentru Faza 2: Filtrăm doar apartamentele care sunt "AVAILABLE"
+                const availableApartments = apartments.filter(apt => apt.status === "AVAILABLE");
+
+                if (availableApartments.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Momentan nu există apartamente disponibile pentru închiriere.</td></tr>`;
+                    return;
+                }
+
+                availableApartments.forEach(apt => {
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${apt.id}</td>
+                            <td>${apt.address}</td>
+                            <td>Bl. ${apt.building}, Et. ${apt.floor}</td>
+                            <td>${apt.rooms} cam (${apt.size} mp)</td>
+                            <td><strong style="color: #28a745;">${apt.monthlyRent} €</strong></td>
+                            <td>${apt.deposit} €</td>
+                            <td>
+                                <button class="btn-sm" style="background-color: #007bff;" onclick="trimiteCerere(${apt.id})">Solicită Închiriere</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error("Eroare la încărcarea apartamentelor:", error);
+                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Eroare la rețea. Nu s-au putut încărca datele.</td></tr>`;
+            }
+        }
+
+        function trimiteCerere(apartmentId) {
+            alert("Apasat solicitare pentru apartamentul cu ID: " + apartmentId + ". Urmează să legăm acest buton de baza de date!");
+        }
+    </script>
+</body>
+</html>

@@ -31,7 +31,7 @@ if (registerForm) {
             if (response.ok) {
                 msgDiv.style.color = "green";
                 msgDiv.innerText = message;
-                setTimeout(() => window.location.href = "login.html", 2000);
+                setTimeout(() => window.location.href = "login.html", 1000);
             } else {
                 msgDiv.style.color = "red";
                 msgDiv.innerText = message;
@@ -64,7 +64,11 @@ if (loginForm) {
                 const userData = await response.json();
                 // Salvăm utilizatorul în memoria browserului ca sesiune locală
                 localStorage.setItem("user", JSON.stringify(userData));
-                window.location.href = "dashboard.html";
+                if(userData.role == "TENANT"){
+                    window.location.href = "browse.html";
+                }else{
+                    window.location.href  = "dashboard.html";
+                }
             } else {
                 const errorText = await response.text();
                 const msgDiv = document.getElementById("loginMessage");
@@ -120,7 +124,7 @@ if (apartmentForm) {
             });
 
             if (response.ok) {
-                alert(isEdit ? "Apartament actualizat!" : "Apartament adăugat cu succes!");
+                console.log(isEdit ? "Apartament actualizat!" : "Apartament adăugat cu succes!");
                 resetForm();
                 loadApartments();
             } else {
