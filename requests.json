@@ -1,0 +1,106 @@
+[ {
+  "id" : 1779291496893,
+  "apartment" : {
+    "id" : 1,
+    "landlord" : {
+      "id" : 2,
+      "fullName" : "a",
+      "email" : "a@a",
+      "passwordHash" : "HASHED_a",
+      "phone" : "a",
+      "role" : "LANDLORD",
+      "createdAt" : [ 2026, 5, 20, 15, 31, 16 ]
+    },
+    "address" : "a",
+    "building" : "a",
+    "floor" : "a",
+    "rooms" : 1,
+    "size" : 1.0,
+    "monthlyRent" : 1.0,
+    "deposit" : 1.0,
+    "status" : "OCCUPIED",
+    "createdAt" : [ 2026, 5, 20, 15, 33, 47 ]
+  },
+  "tenant" : {
+    "id" : 3,
+    "fullName" : "b",
+    "email" : "b@b",
+    "passwordHash" : "HASHED_b",
+    "phone" : "b",
+    "role" : "TENANT",
+    "createdAt" : [ 2026, 5, 20, 15, 34, 12 ]
+  },
+  "status" : "APPROVED",
+  "message" : "salut ",
+  "createdAt" : [ 2026, 5, 20, 18, 38, 16, 893614700 ]
+}, {
+  "id" : 1779291837346,
+  "apartment" : {
+    "id" : 1,
+    "landlord" : {
+      "id" : 2,
+      "fullName" : "a",
+      "email" : "a@a",
+      "passwordHash" : "HASHED_a",
+      "phone" : "a",
+      "role" : "LANDLORD",
+      "createdAt" : [ 2026, 5, 20, 15, 31, 16 ]
+    },
+    "address" : "a",
+    "building" : "a",
+    "floor" : "a",
+    "rooms" : 1,
+    "size" : 1.0,
+    "monthlyRent" : 1.0,
+    "deposit" : 1.0,
+    "status" : "AVAILABLE",
+    "createdAt" : [ 2026, 5, 20, 15, 33, 47 ]
+  },
+  "tenant" : {
+    "id" : 3,
+    "fullName" : "b",
+    "email" : "b@b",
+    "passwordHash" : "HASHED_b",
+    "phone" : "b",
+    "role" : "TENANT",
+    "createdAt" : [ 2026, 5, 20, 15, 34, 12 ]
+  },
+  "status" : "PENDING",
+  "message" : "salut",
+  "createdAt" : [ 2026, 5, 20, 18, 43, 57, 346017700 ]
+}, {
+  "id" : 1779291849169,
+  "apartment" : {
+    "id" : 1,
+    "landlord" : {
+      "id" : 2,
+      "fullName" : "a",
+      "email" : "a@a",
+      "passwordHash" : "HASHED_a",
+      "phone" : "a",
+      "role" : "LANDLORD",
+      "createdAt" : [ 2026, 5, 20, 15, 31, 16 ]
+    },
+    "address" : "a",
+    "building" : "a",
+    "floor" : "a",
+    "rooms" : 1,
+    "size" : 1.0,
+    "monthlyRent" : 1.0,
+    "deposit" : 1.0,
+    "status" : "AVAILABLE",
+    "createdAt" : [ 2026, 5, 20, 15, 33, 47 ]
+  },
+  "tenant" : {
+    "id" : 3,
+    "fullName" : "b",
+    "email" : "b@b",
+    "passwordHash" : "HASHED_b",
+    "phone" : "b",
+    "role" : "TENANT",
+    "createdAt" : [ 2026, 5, 20, 15, 34, 12 ]
+  },
+  "status" : "PENDING",
+  "message" : "sal",
+  "createdAt" : [ 2026, 5, 20, 18, 44, 9, 169720100 ]
+} ]

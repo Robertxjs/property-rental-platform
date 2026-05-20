@@ -34,4 +34,30 @@ public class RentalRequestController {
         List<RentalRequest> tenantRequests = rentalRequestService.getRequestsByTenant(tenantId);
         return ResponseEntity.ok(tenantRequests);
     }
+    @GetMapping("/landlord/{landlordId}")
+public ResponseEntity<List<RentalRequest>> getByLandlord(@PathVariable Long landlordId) {
+    List<RentalRequest> landlordRequests = rentalRequestService.getRequestsByLandlord(landlordId);
+    return ResponseEntity.ok(landlordRequests);
+}
+    // Endpoint pentru aprobarea cererii (PUT /api/rental-requests/{id}/approve)
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<?> approveRequest(@PathVariable Long id) {
+        try {
+            RentalRequest updatedRequest = rentalRequestService.processRequest(id, "approve");
+            return ResponseEntity.ok(updatedRequest);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // Endpoint pentru respingerea cererii (PUT /api/rental-requests/{id}/reject)
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<?> rejectRequest(@PathVariable Long id) {
+        try {
+            RentalRequest updatedRequest = rentalRequestService.processRequest(id, "reject");
+            return ResponseEntity.ok(updatedRequest);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }   
 }
