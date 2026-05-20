@@ -166,8 +166,9 @@
     <nav class="navbar">
         <div class="navbar-brand">RentApp</div>
         <div class="navbar-user-zone">
+            <button onclick="window.location.href='my-rented-apartments.html'" style="width: auto; padding: 8px 15px; background-color: #28a745; margin-right: 10px;">Apartamentele Mele</button>
             <a href="my-requests.html" style="margin-right: 20px; color: #007bff; font-weight: bold; text-decoration: none;">Cererile Mele</a>
-            <span class="user-email">Chiriaș: <strong id="tenantEmail">-</strong></span>
+            <span class="user-email">Utilizator: <strong id="tenantEmail">-</strong></span>
             <button class="logout-btn" onclick="logout()">Deconectare</button>
         </div>
     </nav>
@@ -254,7 +255,6 @@
         }
 
         function trimiteCerere(apartmentId) {
-            alert("Trimiți o solicitare pentru apartamentul cu ID-ul: " + apartmentId);
             window.location.href = "requestFrom.html?apartmentId=" + apartmentId;
         }
     </script>

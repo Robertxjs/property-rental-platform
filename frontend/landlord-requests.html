@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Cereri Primite - RentApp</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block; height: auto; padding: 0; margin: 0; background-color: #f4f6f9; }
+        .navbar { background-color: #ffffff; padding: 15px 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
+        .navbar-brand { font-size: 20px; font-weight: bold; color: #28a745; cursor: pointer; }
+        .container { max-width: 1100px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .badge { padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; color: white; }
+        .badge-pending { background-color: #ffc107; color: black; }
+        .badge-approved { background-color: #28a745; }
+        .badge-rejected { background-color: #dc3545; }
+        .btn-action { padding: 5px 10px; font-size: 12px; width: auto; display: inline-block; cursor: pointer; margin-right: 5px; border: none; border-radius: 4px; color: white; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-brand" onclick="window.location.href='dashboard.html'">RentApp - Panou Proprietar</div>
+        <button onclick="window.location.href='dashboard.html'" style="width: auto; padding: 8px 15px; background-color: #6c757d;">Înapoi în Dashboard</button>
+    </nav>
+
+    <div class="container">
+        <h2>Cereri de Închiriere Primite de la Chiriași</h2>
+        <hr>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Cerere</th>
+                    <th>Apartament (Adresă)</th>
+                    <th>Chiriaș (Nume / Email / Tel)</th>
+                    <th>Mesaj Primit</th>
+                    <th>Status</th>
+                    <th>Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody id="landlordRequestsTableBody">
+                <tr>
+                    <td colspan="6" style="text-align:center;">Se încarcă cererile...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userJson = localStorage.getItem("user");
+            if (!userJson) {
+                window.location.href = "login.html";
+                return;
+            }
+            const user = JSON.parse(userJson);
+            if (user.role !== "LANDLORD") {
+                alert("Acces interdis!");
+                window.location.href = "login.html";
+                return;
+            }
+            
+            loadReceivedRequests(user.id);
+        });
+
+        async function loadReceivedRequests(landlordId) {
+            const tableBody = document.getElementById("landlordRequestsTableBody");
+            
+            try {
+                const response = await fetch("http://localhost:8081/api/rental-requests/landlord/" + landlordId);
+                const requests = await response.json();
+                
+                tableBody.innerHTML = "";
+
+                if (requests.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Nu ai primit nicio cerere de închiriere până acum.</td></tr>`;
+                    return;
+                }
+
+                requests.forEach(req => {
+                    let badgeClass = "badge-pending";
+                    if(req.status === "APPROVED") badgeClass = "badge-approved";
+                    if(req.status === "REJECTED") badgeClass = "badge-rejected";
+
+                    // Generăm butoanele de acțiune doar dacă cererea este încă PENDING
+                    let actionButtons = "";
+                    if (req.status === "PENDING") {
+                        actionButtons = `
+                            <button class="btn-action" style="background-color: #28a745;" onclick="proceseazaCerere(${req.id}, 'approve')">Aprobă</button>
+                            <button class="btn-action" style="background-color: #dc3545;" onclick="proceseazaCerere(${req.id}, 'reject')">Respinge</button>
+                        `;
+                    } else {
+                        actionButtons = `<span style="color:#888; font-size:12px;">Nicio acțiune disponibilă</span>`;
+                    }
+
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${req.id}</td>
+                            <td><strong>ID ${req.apartment ? req.apartment.id : "?"}</strong> - ${req.apartment ? req.apartment.address : "N/A"}</td>
+                            <td>
+                                <strong>${req.tenant ? req.tenant.fullName : "N/A"}</strong><br>
+                                <span style="font-size:12px; color:#555;">${req.tenant ? req.tenant.email : ""}<br>${req.tenant && req.tenant.phone ? req.tenant.phone : "-"}</span>
+                            </td>
+                            <td>"${req.message}"</td>
+                            <td><span class="badge ${badgeClass}">${req.status}</span></td>
+                            <td>${actionButtons}</td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error("Eroare:", error);
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Eroare la aducerea datelor din server.</td></tr>`;
+            }
+        }
+
+        async function proceseazaCerere(requestId, actiune) {
+    const mesajConfirmare = actiune === 'approve'
+        ? "Sigur dorești să APROBI această cerere? Apartamentul va deveni automat OCUPAT."
+        : "Sigur dorești să RESPINGI această cerere?";
+
+    if (!confirm(mesajConfirmare)) return;
+
+    try {
+        const response = await fetch(
+            `http://localhost:8081/api/rental-requests/${requestId}/${actiune}`,
+            { method: "PUT" }
+        );
+
+        if (response.ok) {
+            alert(
+                actiune === 'approve'
+                    ? "Cererea a fost aprobată cu succes!"
+                    : "Cererea a fost respinsă."
+            );
+
+            const user = JSON.parse(localStorage.getItem("user"));
+            loadReceivedRequests(user.id);
+        } else {
+            const errorText = await response.text();
+            alert("Eroare la procesarea cererii: " + errorText);
+        }
+    } catch (error) {
+        console.error("Eroare de rețea:", error);
+        alert("Nu s-a putut contacta serverul.");
+    }
+}
+    </script>
+</body>
+</html>

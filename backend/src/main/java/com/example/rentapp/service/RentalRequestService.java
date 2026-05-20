@@ -96,4 +96,60 @@ public class RentalRequestService {
         File file = new File(FILE_PATH);
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, requests);
     }
+    public List<RentalRequest> getRequestsByLandlord(Long landlordId) {
+    try {
+        List<RentalRequest> allRequests = readRequestsFromFile();
+        // Filtrăm cererile: păstrăm doar cele unde apartamentul are landlord_id egal cu ID-ul curent
+        return allRequests.stream()
+                .filter(req -> req.getApartment() != null && 
+                               req.getApartment().getLandlord() != null && 
+                               req.getApartment().getLandlord().getId().equals(landlordId))
+                .collect(Collectors.toList());
+    } catch (IOException e) {
+        return new ArrayList<>();
+    }
+}
+    // 4. Metoda pentru APROBARE sau RESPINGERE cerere (cu salvare în JSON și update status apartament în MySQL)
+public RentalRequest processRequest(Long requestId, String action) {
+    try {
+        List<RentalRequest> allRequests = readRequestsFromFile();
+        RentalRequest targetRequest = null;
+
+        // Căutăm cererea după ID-ul simulat (timestamp) în lista din JSON
+        for (RentalRequest req : allRequests) {
+            if (req.getId().equals(requestId)) {
+                targetRequest = req;
+                break;
+            }
+        }
+
+        if (targetRequest == null) {
+            throw new RuntimeException("Cererea cu ID-ul specificat nu a fost găsită!");
+        }
+
+        // Modificăm statusul în funcție de acțiune
+        if ("approve".equalsIgnoreCase(action)) {
+            targetRequest.setStatus(RequestStatus.APPROVED);
+            
+            // Regula de aur: Dacă cererea este aprobată, marcăm apartamentul ca ocupat în MySQL
+            Apartment apartment = targetRequest.getApartment();
+            if (apartment != null) {
+                // Îi schimbăm statusul entității și o salvăm în baza de date
+                apartment.setStatus("OCCUPIED");
+                apartmentRepository.save(apartment);
+            }
+        } else if ("reject".equalsIgnoreCase(action)) {
+            targetRequest.setStatus(RequestStatus.REJECTED);
+        } else {
+            throw new IllegalArgumentException("Acțiune invalidă! Folosește 'approve' sau 'reject'.");
+        }
+
+        // Rescriem fișierul JSON cu datele actualizate
+        writeRequestsToFile(allRequests);
+        return targetRequest;
+
+    } catch (IOException e) {
+        throw new RuntimeException("Eroare la scrierea modificărilor în fișierul JSON: " + e.getMessage());
+    }
+}
 }
