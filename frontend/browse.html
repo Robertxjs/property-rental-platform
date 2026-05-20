@@ -5,42 +5,178 @@
     <title>Apartamente Disponibile - RentApp</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { display: block; height: auto; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f8f9fa; }
-        .btn-sm { padding: 5px 10px; font-size: 12px; width: auto; display: inline-block; }
-        .user-info { font-size: 14px; color: #666; }
+        /* Resetăm comportamentul din style.css pentru a permite curgerea naturală a paginii */
+        body { 
+            display: block; 
+            height: auto; 
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Stiluri pentru Bara de Navigare (Navbar) */
+        .navbar {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .navbar-user-zone {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .user-email {
+            font-size: 14px;
+            color: #555;
+        }
+        .logout-btn {
+            width: auto;
+            padding: 8px 16px;
+            background-color: #dc3545;
+            font-size: 14px;
+        }
+        .logout-btn:hover {
+            background-color: #bd2130;
+        }
+
+        /* Container principal pentru conținut */
+        .container { 
+            max-width: 1200px; 
+            margin: 30px auto; 
+            padding: 0 20px; 
+        }
+        
+        .page-title {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        /* Grid-ul care așează cardurile pe mai multe coloane pe un rând */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        /* Design-ul unui singur Card de Apartament */
+        .apartment-card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #eef2f5;
+        }
+        .apartment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Locul lăsat liber pentru viitoarea poză a landlordului */
+        .card-image-placeholder {
+            height: 180px;
+            background-color: #eaedf2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #8c9ba5;
+            font-size: 13px;
+            font-style: italic;
+            border-bottom: 1px solid #e2e7ec;
+            text-align: center;
+            padding: 0 10px;
+        }
+        .placeholder-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* Conținutul din interiorul cardului */
+        .card-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .card-address {
+            font-size: 17px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .card-details {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .detail-line {
+            margin-bottom: 4px;
+        }
+        
+        /* Zona de preț, împinsă automat în josul cardului */
+        .card-footer {
+            margin-top: auto;
+        }
+        .card-price {
+            font-size: 20px;
+            color: #28a745;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .price-label {
+            font-size: 12px;
+            color: #888;
+            font-weight: normal;
+        }
+
+        /* Suport pentru starea când nu sunt apartamente */
+        .no-apartments {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 8px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h2>Platforma de Închirieri - Apartamente Disponibile</h2>
-                <div class="user-info">Conectat ca: <strong id="tenantEmail">-</strong> (Chiriaș)</div>
-            </div>
-            <button onclick="logout()" style="width: auto; padding: 8px 15px; background-color: #dc3545;">Deconectare</button>
-        </div>
-        <hr style="margin: 20px 0;">
 
-        <h3>Listă Proprietăți Disponibile</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Adresă</th>
-                    <th>Detalii (Bloc/Etaj)</th>
-                    <th>Camere / Suprafață</th>
-                    <th>Chirie Lunară</th>
-                    <th>Depozit / Garanție</th>
-                    <th>Acțiune</th>
-                </tr>
-            </thead>
-            <tbody id="browseTableBody">
-                </tbody>
-        </table>
+    <nav class="navbar">
+        <div class="navbar-brand">RentApp</div>
+        <div class="navbar-user-zone">
+            <a href="my-requests.html" style="margin-right: 20px; color: #007bff; font-weight: bold; text-decoration: none;">Cererile Mele</a>
+            <span class="user-email">Chiriaș: <strong id="tenantEmail">-</strong></span>
+            <button class="logout-btn" onclick="logout()">Deconectare</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 class="page-title">Descoperă Apartamente Disponibile</h2>
+        
+        <div class="cards-grid" id="browseCardsContainer">
+            <div class="no-apartments">Se încarcă apartamentele...</div>
+        </div>
     </div>
 
     <script src="app.js"></script>
@@ -64,46 +200,61 @@
         });
 
         async function loadAvailableApartments() {
-            const tableBody = document.getElementById("browseTableBody");
-            if (!tableBody) return;
+            const cardsContainer = document.getElementById("browseCardsContainer");
+            if (!cardsContainer) return;
 
             try {
                 const response = await fetch("http://localhost:8081/api/apartments");
                 const apartments = await response.json();
                 
-                tableBody.innerHTML = "";
+                cardsContainer.innerHTML = "";
 
-                // Regula de business pentru Faza 2: Filtrăm doar apartamentele care sunt "AVAILABLE"
+                // Filtrăm doar apartamentele care au statusul "AVAILABLE"
                 const availableApartments = apartments.filter(apt => apt.status === "AVAILABLE");
 
                 if (availableApartments.length === 0) {
-                    tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Momentan nu există apartamente disponibile pentru închiriere.</td></tr>`;
+                    cardsContainer.innerHTML = `<div class="no-apartments">Momentan nu există apartamente disponibile pentru închiriere.</div>`;
                     return;
                 }
 
                 availableApartments.forEach(apt => {
-                    tableBody.innerHTML += `
-                        <tr>
-                            <td>${apt.id}</td>
-                            <td>${apt.address}</td>
-                            <td>Bl. ${apt.building}, Et. ${apt.floor}</td>
-                            <td>${apt.rooms} cam (${apt.size} mp)</td>
-                            <td><strong style="color: #28a745;">${apt.monthlyRent} €</strong></td>
-                            <td>${apt.deposit} €</td>
-                            <td>
-                                <button class="btn-sm" style="background-color: #007bff;" onclick="trimiteCerere(${apt.id})">Solicită Închiriere</button>
-                            </td>
-                        </tr>
+                    cardsContainer.innerHTML += `
+                        <div class="apartment-card">
+                            <div class="card-image-placeholder">
+                                <span class="placeholder-icon">🏠</span>
+                                <span>Nicio imagine încărcată</span>
+                            </div>
+                            
+                            <div class="card-content">
+                                <div class="card-address" title="${apt.address}">${apt.address}</div>
+                                
+                                <div class="card-details">
+                                    <div class="detail-line"><strong>Clădire/Bloc:</strong> ${apt.building}</div>
+                                    <div class="detail-line"><strong>Etaj:</strong> ${apt.floor}</div>
+                                    <div class="detail-line"><strong>Configurație:</strong> ${apt.rooms} camere</div>
+                                    <div class="detail-line"><strong>Suprafață:</strong> ${apt.size} mp</div>
+                                    <div class="detail-line"><strong>Garanție cerută:</strong> ${apt.deposit} €</div>
+                                </div>
+                                
+                                <div class="card-footer">
+                                    <div class="card-price">
+                                        ${apt.monthlyRent} € <span class="price-label">/ lună</span>
+                                    </div>
+                                    <button onclick="trimiteCerere(${apt.id})">Solicită Închiriere</button>
+                                </div>
+                            </div>
+                        </div>
                     `;
                 });
             } catch (error) {
                 console.error("Eroare la încărcarea apartamentelor:", error);
-                tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Eroare la rețea. Nu s-au putut încărca datele.</td></tr>`;
+                cardsContainer.innerHTML = `<div class="no-apartments" style="color:red;">Eroare la rețea. Nu s-au putut încărca proprietățile.</div>`;
             }
         }
 
         function trimiteCerere(apartmentId) {
-            alert("Apasat solicitare pentru apartamentul cu ID: " + apartmentId + ". Urmează să legăm acest buton de baza de date!");
+            alert("Trimiți o solicitare pentru apartamentul cu ID-ul: " + apartmentId);
+            window.location.href = "requestFrom.html?apartmentId=" + apartmentId;
         }
     </script>
 </body>

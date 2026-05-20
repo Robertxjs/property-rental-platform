@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Trimite Solicitare Închiriere - RentApp</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f6f9; margin: 0; }
+        .form-container { background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); width: 450px; }
+        h2 { margin-top: 0; color: #333; text-align: center; }
+        .info-box { background-color: #eef2f5; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; color: #495057; }
+        textarea { width: 100%; height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; resize: none; margin-bottom: 15px; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn-secondary { background-color: #6c757d; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .message { margin-top: 15px; text-align: center; font-weight: bold; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Solicitare Închiriere</h2>
+        <hr style="margin-bottom: 20px; border: 0; border-top: 1px solid #eee;">
+        
+        <div class="info-box">
+            Trimiteți o cerere de închiriere pentru apartamentul cu <strong>ID: <span id="targetApartmentId">-</span></strong>.
+        </div>
+
+        <form id="rentalRequestForm">
+            <div class="form-group">
+                <label for="requestMessage">Scrie un mesaj pentru proprietar:</label>
+                <textarea id="requestMessage" placeholder="Prezintă-te pe scurt și menționează când dorești să te muți..." required></textarea>
+            </div>
+            
+            <div class="btn-group">
+                <button type="submit">Trimite Solicitarea</button>
+                <button type="button" class="btn-secondary" onclick="window.location.href='browse.html'">Anulează</button>
+            </div>
+        </form>
+
+        <div id="statusMessage" class="message"></div>
+    </div>
+
+    <script>
+        // Extragem ID-ul apartamentului din parametrii URL-ului (?apartmentId=X)
+        const urlParams = new URLSearchParams(window.location.search);
+        const apartmentId = urlParams.get('apartmentId');
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Verificăm dacă utilizatorul este logat și dacă este TENANT
+            const userJson = localStorage.getItem("user");
+            if (!userJson) {
+                window.location.href = "login.html";
+                return;
+            }
+            const user = JSON.parse(userJson);
+            if (user.role !== "TENANT") {
+                alert("Doar chiriașii pot trimite solicitări!");
+                window.location.href = "dashboard.html";
+                return;
+            }
+
+            // Dacă lipsește ID-ul apartamentului din URL, îl trimitem înapoi
+            if (!apartmentId) {
+                alert("Eroare: Nu a fost selectat niciun apartament.");
+                window.location.href = "browse.html";
+                return;
+            }
+
+            document.getElementById("targetApartmentId").innerText = apartmentId;
+        });
+
+        // Logica de trimitere a formularului către API-ul de backend
+        document.getElementById("rentalRequestForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const currentUser = JSON.parse(localStorage.getItem("user"));
+            const messageText = document.getElementById("requestMessage").value;
+            const msgDiv = document.getElementById("statusMessage");
+
+            // Pregătim obiectul JSON (Payload) cerut de specificațiile API
+            const payload = {
+                apartmentId: parseInt(apartmentId),
+                tenantId: currentUser.id,
+                message: messageText
+            };
+
+            try {
+                const response = await fetch("http://localhost:8081/api/rental-requests", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    msgDiv.style.color = "green";
+                    msgDiv.innerText = "Solicitarea a fost trimisă cu succes!";
+                    // Redirecționăm chiriașul după 2 secunde către istoricul cererilor sale
+                    setTimeout(() => window.location.href = "my-requests.html", 2000);
+                } else {
+                    const errorText = await response.text();
+                    msgDiv.style.color = "red";
+                    msgDiv.innerText = "Eroare la trimitere: " + errorText;
+                }
+            } catch (error) {
+                console.error("Eroare de rețea:", error);
+                msgDiv.style.color = "red";
+                msgDiv.innerText = "Nu s-a putut contacta serverul.";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Cererile Mele - RentApp</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: block; height: auto; padding: 0; margin: 0; background-color: #f4f6f9; }
+        .navbar { background-color: #ffffff; padding: 15px 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; justify-content: space-between; align-items: center; }
+        .navbar-brand { font-size: 20px; font-weight: bold; color: #007bff; cursor: pointer; }
+        .container { max-width: 1000px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; }
+        .badge { padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; color: white; }
+        .badge-pending { background-color: #ffc107; color: black; }
+        .badge-approved { background-color: #28a745; }
+        .badge-rejected { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-brand" onclick="window.location.href='browse.html'">RentApp</div>
+        <button onclick="logout()" style="width: auto; padding: 8px 15px; background-color: #dc3545;">Deconectare</button>
+    </nav>
+
+    <div class="container">
+        <h2>Istoricul Cererilor Tale de Închiriere</h2>
+        <hr>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Solicitare</th>
+                    <th>Adresă Apartament</th>
+                    <th>Chirie Lunară</th>
+                    <th>Mesajul tău</th>
+                    <th>Statusul Cererii</th>
+                </tr>
+            </thead>
+            <tbody id="requestsTableBody">
+                <tr>
+                    <td colspan="5" style="text-align:center;">Se încarcă cererile...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userJson = localStorage.getItem("user");
+            if (!userJson) {
+                window.location.href = "login.html";
+                return;
+            }
+            const user = JSON.parse(userJson);
+            loadMyRequests(user.id);
+        });
+
+        async function loadMyRequests(tenantId) {
+            const tableBody = document.getElementById("requestsTableBody");
+            
+            try {
+                const response = await fetch("http://localhost:8081/api/rental-requests/tenant/" + tenantId);
+                const requests = await response.json();
+                
+                tableBody.innerHTML = "";
+
+                if (requests.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Nu ai trimis nicio solicitare până acum.</td></tr>`;
+                    return;
+                }
+
+                requests.forEach(req => {
+                    let badgeClass = "badge-pending";
+                    if(req.status === "APPROVED") badgeClass = "badge-approved";
+                    if(req.status === "REJECTED") badgeClass = "badge-rejected";
+
+                    tableBody.innerHTML += `
+                        <tr>
+                            <td>${req.id}</td>
+                            <td>${req.apartment ? req.apartment.address : "N/A"}</td>
+                            <td><strong>${req.apartment ? req.apartment.monthlyRent : 0} €</strong></td>
+                            <td>${req.message}</td>
+                            <td><span class="badge ${badgeClass}">${req.status}</span></td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                console.error("Eroare la incarcarea cererilor:", error);
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:red;">Eroare la conectarea cu serverul.</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
